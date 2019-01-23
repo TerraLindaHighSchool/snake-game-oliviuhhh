@@ -11,7 +11,7 @@ public class SnakeSegment {
     private int XLoc;
     private int YLoc;
     private Body mBodyParts;
-    private int mDegree;
+    private int mDegrees;
 
 
     /*************************************************
@@ -23,9 +23,9 @@ public class SnakeSegment {
         HEAD, BODY, TAIL;
     }
 
-    public SnakeSegment (Body bodyParts, int degree ,int XLoc, int YLoc){
+    public SnakeSegment (Body bodyParts, int degrees ,int XLoc, int YLoc){
         mBodyParts = bodyParts;
-        mDegree = degree;
+        mDegrees = degrees;
         XLoc = XLoc;
         YLoc = YLoc;
 
@@ -55,11 +55,11 @@ public class SnakeSegment {
         return mBodyParts;
     }
 
-    public int getmDegree() {
-        return mDegree;
+    public int getmDegrees() {
+        return mDegrees;
     }
 
-    public void setmDegree(int mDegree) {
-        this.mDegree = mDegree;
+    public void setmDegrees(int mDegrees) {
+        this.mDegrees = mDegrees;
     }
 }
