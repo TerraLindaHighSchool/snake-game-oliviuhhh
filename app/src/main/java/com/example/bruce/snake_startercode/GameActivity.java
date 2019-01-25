@@ -1,8 +1,5 @@
 package com.example.bruce.snake_startercode;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.provider.DocumentsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -22,49 +20,53 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import static com.example.bruce.snake_startercode.SnakeSegment.Body.BODY;
+import static com.example.bruce.snake_startercode.SnakeSegment.Body.HEAD;
+import static com.example.bruce.snake_startercode.SnakeSegment.Body.TAIL;
+
 public class GameActivity extends AppCompatActivity {
+
     private ImageView mImageView;
     private TextView mTextScore, mTextHighScore, mTextCountdown;
     private int mBOARD_WIDTH, mBOARD_HEIGHT;
     private SnakeGame mGame;
     private Bitmap mHeadBitmap, mBodyBitmap, mTailBitmap, mAppleBitmap;
     private Handler mHandler;
-    private Matrix mMatrix;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        // Get view IDs and dimensions Resources
+        // Get View IDs and Dimension Resources
         mImageView = findViewById(R.id.imageView);
         mTextScore = findViewById(R.id.textView_score);
         mTextHighScore = findViewById(R.id.textView_highScore);
-        mTextCountdown = findViewById(R.id.textView_score);
+        mTextCountdown = findViewById(R.id.textView_level);
         mBOARD_WIDTH = (int) getResources().getDimension(R.dimen.width);
         mBOARD_HEIGHT = (int) getResources().getDimension(R.dimen.height);
 
+        // Instantiate the game
+        mGame = new SnakeGame(0,80,3,4, mBOARD_WIDTH, mBOARD_HEIGHT);
 
-        //instantiate the game
-        mGame = new SnakeGame(0, 80, 3, 4, mBOARD_WIDTH, mBOARD_HEIGHT);
-
-        //add bitmaps
+        //  Add Bitmaps
         mHeadBitmap = BitmapFactory.decodeResource(mImageView.getResources(), R.drawable.head);
         mBodyBitmap = BitmapFactory.decodeResource(mImageView.getResources(), R.drawable.body);
         mTailBitmap = BitmapFactory.decodeResource(mImageView.getResources(), R.drawable.tail);
         mAppleBitmap = BitmapFactory.decodeResource(mImageView.getResources(), R.drawable.apple);
 
-        //Listen for screen touches
+        // Listen for screen touches
         mImageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch (View v, MotionEvent event){
+            public boolean onTouch(View v, MotionEvent event) {
                 float xTouch = event.getX();
                 float yTouch = event.getY();
                 mGame.touched(xTouch, yTouch);
                 return false;
             }
         });
-        //Snake Animation
+
+        // Snake Animation
         mHandler = new Handler();
         final Runnable r = new Runnable() {
             @Override
@@ -72,34 +74,34 @@ public class GameActivity extends AppCompatActivity {
                 boolean localStop = mGame.play();
                 paintCanvas();
                 mHandler.postDelayed(this, mGame.getMillisDelay());
-                if (localStop) {
+                if(localStop) {
                     mHandler.removeCallbacks(this);
                     showToast("Game Over");
                 } else updateAndDeclareScores();
             }
         };
-        if (mGame.getGameOver()) mHandler.removeCallbacks(r);
-        mHandler.PostDelayed(r, mGame.getMillisDelay());
-
+        if(mGame.getGameOver()) mHandler.removeCallbacks(r);
+        mHandler.postDelayed(r, mGame.getMillisDelay());
     }
-    public void paintCanvas(){
+
+    public void paintCanvas() {
         List<SnakeSegment> snake = mGame.getSnake();
-        int[] applecCoord = mGame.getApplecoord();
+        int[] appleCoord = mGame.getAppleCoord();
         int appleLeft = appleCoord[0];
         int appleTop = appleCoord[1];
         Bitmap ourBitmap = Bitmap.createBitmap(mBOARD_WIDTH, mBOARD_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas window = new Canvas(ourBitmap);
         Rect rectangle = null;
         Bitmap currentBitmap = null;
-        window.drawColor(Color.BLACK); //Background color
+        window.drawColor(Color.BLACK); // Background color
 
-        //draw snake
-        for(int segment = 0; segment < snake.size(); segment++){
-            rectangle = new Rect(snake.get(segment).getXLoc() * mGame.getSpriteDim,
+        // Draw Snake
+        for (int segment = 0; segment < snake.size(); segment++) {
+            rectangle = new Rect(snake.get(segment).getXLoc() * mGame.getSpriteDim(),
                     snake.get(segment).getYLoc() * mGame.getSpriteDim(),
-                    (snake.get(segment).getXLoc() + 1) * mGame.getSpriteDim()),
+                    (snake.get(segment).getXLoc() + 1) * mGame.getSpriteDim(),
                     (snake.get(segment).getYLoc() + 1) * mGame.getSpriteDim());
-            switch(snake.get(segment).getBodyParts()){
+            switch (snake.get(segment).getmBodyParts()) {
                 case HEAD:
                     currentBitmap = mHeadBitmap;
                     break;
@@ -110,42 +112,49 @@ public class GameActivity extends AppCompatActivity {
                     currentBitmap = mTailBitmap;
                     break;
             }
-            if(snake.get(segment).getDegrees() == 0)
+            if (snake.get(segment).getmDegrees() == 0)
                 window.drawBitmap(currentBitmap, null, rectangle, null);
             else
-                window.drawBitmap(rotateBitmap(currentBitmap, snake.get(segment).getDegrees()), null, rectangle, null);
-
+                window.drawBitmap(rotateBitmap(currentBitmap, snake.get(segment).getmDegrees()),
+                        null, rectangle, null);
         }
 
-        //Draw Apple
-        rectangle = new Rect(appleleft, appleTop, appleLeft + mGame.getSpriteDim(), appleTop + mGame.getSpriteDim());
+        // Draw Apple
+        rectangle = new Rect(appleLeft, appleTop, appleLeft + mGame.getSpriteDim(),
+                appleTop + mGame.getSpriteDim());
+        window.drawBitmap(mAppleBitmap, null, rectangle, null);
+        mImageView.setImageBitmap(ourBitmap);
     }
-    public Bitmap rotateBitmap(Bitmap original, float degrees){
+
+    public Bitmap rotateBitmap(Bitmap original, float degrees) {
         int width = original.getWidth();
         int height = original.getHeight();
         Matrix matrix = new Matrix();
-        if(degrees == 180)
-            matrix.postScale(-1, 1, width/2, height/2);
+        if (degrees == 180)
+            matrix.postScale(-1, 1, width / 2, height / 2);
         else
             matrix.postRotate(degrees);
         return Bitmap.createBitmap(original, 0, 0, width, height, matrix, true);
     }
 
-    //misc Concrete Methods
-    private void showToast(String toast) {
+    /****************************************************
+     * Misc Concrete Methods
+     ****************************************************/
+    private void showToast(String toast){
         Toast correct = Toast.makeText(this, toast, Toast.LENGTH_LONG);
         correct.setGravity(Gravity.TOP| Gravity.CENTER_HORIZONTAL, 0, 320);
         correct.show();
     }
-    protected void updateAndDeclareScores() {
+
+    protected void updateAndDeclareScores(){
         SharedPreferences prefs = getSharedPreferences("Snake", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         int highScore = prefs.getInt("High Score", 0);
         int currentScore = mGame.getScore();
         String score = "Score: " + currentScore;
         mTextScore.setText(score);
-        String highScoreStr = "High Score: " + highScore;
-        if (currentScore > highScore) {
+        String highScoreStr = ("High Score: " + currentScore);
+        if(currentScore > highScore){
             editor.putInt("High Score", currentScore);
             editor.commit();
             highScoreStr = "High Score: " + currentScore;
