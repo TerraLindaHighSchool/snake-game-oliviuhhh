@@ -1,3 +1,5 @@
+package com.example.bruce.snake_startercode;
+
 import java.util.ArrayList;
 import java.util.List;
 
