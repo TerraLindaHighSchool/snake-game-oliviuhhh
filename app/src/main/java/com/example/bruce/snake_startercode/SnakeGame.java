@@ -89,13 +89,12 @@ public class SnakeGame {
       }
 
 
-
-
-      private void setAppleCoord(){
-    mAppleCoord[0] = (int)(mBOARD_WIDTH*Math.random());
-    mAppleCoord[1] = (int)(mBOARD_HEIGHT*Math.random());
+      private void setAppleCoord () {
+        mAppleCoord[0] = (int) (mBOARD_WIDTH * Math.random());
+        mAppleCoord[1] = (int) (mBOARD_HEIGHT * Math.random());
+      }
+    }
   }
-
   // getters and Setters
 
   protected int getSpriteDim(){
