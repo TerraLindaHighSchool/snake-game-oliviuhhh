@@ -11,28 +11,44 @@ public class SnakeGame {
   private boolean mGameOver;
 
 
-  public SnakeGame(int beginningDirection, int beginningSpriteDim, int beginningX, int beginningY, int width, int height, int xMax, int yMax){
+  public SnakeGame(int beginningDirection, int beginningSpriteDim, int beginningX, int beginningY, int width, int height){
     mSpriteDim = beginningSpriteDim;
     mBOARD_WIDTH = width;
     mBOARD_HEIGHT = height;
-    mXMax = xMax;
-    mYMax = yMax;
+    mXMax = width / beginningSpriteDim;
+    mYMax = height / beginningSpriteDim;
     mScore = 0;
     mLevel = 1;
     mCountdown = 12;
     mMillisDelay = 400;
     mAppleCoord = new int[2];
-    setAppleCoord();
     mSnake = new ArrayList<>();
     mPivotPoint = new ArrayList<>();
     mSnake.add(new SnakeSegment(SnakeSegment.Body.HEAD, beginningDirection,beginningX,beginningY));
     mSnake.add(new SnakeSegment(SnakeSegment.Body.BODY, beginningDirection,beginningX-1,beginningY));
     mSnake.add(new SnakeSegment(SnakeSegment.Body.TAIL, beginningDirection,beginningX-2,beginningY));
     mGameOver = false;
+    setAppleCoord();
   }
 
   protected void touched(float xTouched, float yTouched){
-
+    int snakeHeadX = mSnake.get(0).getXLoc();
+    int snakeHeadY= mSnake.get(0).getYLoc();
+    int direction = mSnake.get(0).getmDegrees();
+    if (direction == 0 || direction == 180){
+      if (snakeHeadY * mSpriteDim > yTouched) {
+        direction = 270;
+      } else {
+        direction = 90;
+      }
+    } else {
+      if (snakeHeadX * mSpriteDim > xTouched) {
+        direction = 180;
+      } else {
+        direction = 0;
+      }
+    }
+    mPivotPoint.add(new PivotPoint(snakeHeadX, snakeHeadY, direction));
   }
 
   protected void eatApple(){
@@ -87,14 +103,14 @@ public class SnakeGame {
         case 270:
           mSnake.get(i).setYLoc(--yLoc);
       }
-
-
-      private void setAppleCoord () {
-        mAppleCoord[0] = (int) (mBOARD_WIDTH * Math.random());
-        mAppleCoord[1] = (int) (mBOARD_HEIGHT * Math.random());
-      }
     }
+    return mGameOver;
   }
+
+    private void setAppleCoord () {
+      mAppleCoord[0] = (int) ((mXMax - 1) * Math.random() + 1) * mSpriteDim;
+      mAppleCoord[1] = (int) ((mYMax - 1) * Math.random() + 1) * mSpriteDim;
+    }
   // getters and Setters
 
   protected int getSpriteDim(){
