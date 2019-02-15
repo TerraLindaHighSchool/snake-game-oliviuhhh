@@ -51,11 +51,17 @@ public class SnakeGame {
     mPivotPoint.add(new PivotPoint(snakeHeadX, snakeHeadY, direction));
   }
 
-  protected void eatApple(){
+  protected void eatApple() {
+    if (mAppleCoord[0] == mSnake.get(0).getXLoc()*getSpriteDim() && mAppleCoord[1] == mSnake.get(0).getYLoc()*getSpriteDim()){
+      growSnake();
+      setAppleCoord();
+    }
 
   }
 
   protected boolean play() {
+
+      eatApple();
     SnakeSegment.Body seg;
     int xLoc, yLoc, degrees;
 
@@ -107,9 +113,37 @@ public class SnakeGame {
     return mGameOver;
   }
 
+    private void growSnake(){
+    SnakeSegment currentTail = mSnake.get(mSnake.size() - 1);
+    mSnake.add((mSnake.size() - 1), new SnakeSegment(SnakeSegment.Body.BODY, currentTail.getmDegrees(), currentTail.getXLoc(), currentTail.getYLoc()));
+
+    switch(currentTail.getmDegrees()){
+      case 0:
+        mSnake.get(mSnake.size() - 1).setXLoc(mSnake.get(mSnake.size() - 1).getXLoc() - 1);
+
+        break;
+
+      case 90:
+        mSnake.get(mSnake.size() - 1).setYLoc(mSnake.get(mSnake.size() - 1).getYLoc() - 1);
+
+        break;
+
+      case 180:
+        mSnake.get(mSnake.size() - 1).setXLoc(mSnake.get(mSnake.size() - 1).getXLoc() - 1);
+
+        break;
+
+      case 270:
+        mSnake.get(mSnake.size() - 1).setYLoc(mSnake.get(mSnake.size() - 1).getYLoc() - 1);
+
+        break;
+    }
+
+  }
+
     private void setAppleCoord () {
-      mAppleCoord[0] = (int) ((mXMax - 1) * Math.random() + 1) * mSpriteDim;
-      mAppleCoord[1] = (int) ((mYMax - 1) * Math.random() + 1) * mSpriteDim;
+      mAppleCoord[0] = (int) ((mBOARD_WIDTH-1)*Math.random()+1);
+      mAppleCoord[1] = (int) ((mBOARD_HEIGHT-1)*Math.random()+1);
     }
   // getters and Setters
 
